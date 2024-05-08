@@ -9,10 +9,9 @@ import { StripeService } from 'src/stripe/stripe.service';
 export class UserService {
 
     constructor(
-        private stripeService: StripeService,
-        @InjectModel(UserModel) private user: Model<UserDocument>
+    private stripeService: StripeService,
+    @InjectModel(UserModel) private user: Model<UserDocument>
     ) { }
-
 
     async create(body) {
         try {
@@ -27,17 +26,14 @@ export class UserService {
                 return {
                     statusCode: 200,
                     message: 'user created',
-                    user,
-                    data
+                    data: user,
                 }
             }
         } catch (error) {
             return error.response
         }
     }
-
-
-
+    
 }
 
 

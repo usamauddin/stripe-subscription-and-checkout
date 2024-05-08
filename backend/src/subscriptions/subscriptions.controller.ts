@@ -4,6 +4,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { Request } from 'express';
 
+
 @Controller('subscriptions')
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) { }
@@ -44,23 +45,6 @@ export class SubscriptionsController {
     }
   }
 
-  @Put('/resume')
-  resumeSubscription(@Body() body) {
-    try {
-      return this.subscriptionsService.resumeSubscription(body)
-    } catch (error) {
-      return error.response
-    }
-  }
-
-  @Put('/update')
-  updateSubscription(@Body() body) {
-    try {
-      return this.subscriptionsService.updateSubscription(body)
-    } catch (error) {
-      return error.response
-    }
-  }
 
   @Get('/checkout')
   async checkout(@Req() req: Request, @Res() res: Response) {

@@ -4,7 +4,9 @@ import { Types } from "mongoose";
 import { ProductModel } from "src/product/entities/product.entity";
 import { UserModel } from "src/user/entities/user.entity";
 
-@Schema()
+@Schema({
+    timestamps: true,
+})
 export class Subscription {
 
     @Prop({ required: true })

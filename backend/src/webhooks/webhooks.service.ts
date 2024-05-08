@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer'
@@ -8,6 +8,7 @@ import { Model } from 'mongoose';
 import { SubscriptionDocument, SubscriptionModel } from 'src/subscriptions/entities/subscription.entity';
 import { ProductDocument, ProductModel } from 'src/product/entities/product.entity';
 import { StripeService } from 'src/stripe/stripe.service';
+
 
 @Injectable()
 export class WebhooksService {
@@ -54,7 +55,7 @@ export class WebhooksService {
         })
         .catch((err) => {
           console.log(err);
-          throw new ServiceUnavailableException('error sending email.')
+          throw new InternalServerErrorException('error sending email.')
         })
     } catch (error) {
       return error.response
@@ -117,12 +118,6 @@ export class WebhooksService {
 
         break;
 
-      case 'subscription_schedule.completed':
-
-        const subscriptionScheduleCompleted = event.data.object;
-        const user_email = subscriptionScheduleCompleted.customer_details.email
-        await this.sendEmail(user_email, 'your subscription schedule is comleted')
-        break;
 
       case 'invoice.payment_failed':
         const invoicePaymentFailed = event.data.object
@@ -151,5 +146,6 @@ export class WebhooksService {
         console.log(`Unhandled event type ${event.type}`)
     }
   }
+
 
 }

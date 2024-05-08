@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SocketModule } from './socket/socket.module';
+// import { SocketModule } from './socket/socket.module';
 import { UserModule } from './user/user.module';
 import { ProductModule } from './product/product.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
@@ -14,13 +14,14 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, cache: true }),
-    SocketModule,
-    UserModule,
-    ProductModule,
-    SubscriptionsModule,
-    DBModule,
+    // SocketModule,
+    // DBModule,
+    // UserModule,
+    // ProductModule,
+    // SubscriptionsModule,
     StripeModule,
-    WebhooksModule],
+    // WebhooksModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

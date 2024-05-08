@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ProductDocument, ProductModel } from './entities/product.entity';
 import { Model } from 'mongoose';
@@ -18,7 +18,11 @@ export class ProductService {
   async addProduct(body) {
     try {
       if (body.amount <= 0) {
-        throw new BadRequestException('Invalid amount')
+        throw new BadRequestException({
+          message: 'Invalid amount', 
+          data: null,
+          statusCode: 400
+        })
       }
       else {
         const { userId, stripeId, currency, amount, interval, name } = body
@@ -47,19 +51,31 @@ export class ProductService {
                 }
               }
               else {
-                throw new ServiceUnavailableException('Product with same name already exsist.')
+                throw new BadRequestException({
+                  message: 'Product with same name already exsist.', data: null,
+                  statusCode: 400
+                })
               }
             }
             else {
-              throw new NotFoundException('invalid interval')
+              throw new NotFoundException({
+                message: 'invalid interval', data: null,
+                statusCode: 400
+              })
             }
           }
           else {
-            throw new NotFoundException('incorrect stripe id.')
+            throw new NotFoundException({
+              message: 'incorrect stripe id.', data: null,
+              statusCode: 400
+            })
           }
         }
         else {
-          throw new NotFoundException('user not found.')
+          throw new NotFoundException({
+            message: 'user not found.', data: null,
+            statusCode: 400
+          })
         }
       }
     } catch (error) {
@@ -84,35 +100,35 @@ export class ProductService {
 
               const product = await this.product.find({ $and: [{ userId: { $eq: userId } }, { name: { $eq: name } }] })
 
-              if(product.length === 0) {
+              if (product.length === 0) {
                 const stripe = await this.stripeService.updateProduct(productId, name)
                 const newProduct = await this.product.findByIdAndUpdate({ _id: isProductExsist._id }, { name }, { new: true })
-  
+
                 return {
                   message: 'product updated',
                   statusCode: 200,
-                  newProduct,
-                  stripe
+                  data: newProduct,
+                  // stripe
                 }
               }
-              else{
-                  throw new ServiceUnavailableException('product with same name already exsist')
+              else {
+                throw new BadRequestException({ message: 'product with same name already exsist', statusCode: 400, data: null })
               }
             }
             else {
-              throw new NotFoundException('product not found in stripe')
+              throw new NotFoundException({ message: 'product not found in stripe', statusCode: 400, data: null })
             }
           }
           else {
-            throw new NotFoundException('product not found.')
+            throw new NotFoundException({ message: 'product not found.', statusCode: 400, data: null })
           }
         }
         else {
-          throw new NotFoundException('Stripe id not found.')
+          throw new NotFoundException({ message: 'Stripe id not found.', statusCode: 400, data: null })
         }
       }
       else {
-        throw new NotFoundException('User not found.')
+        throw new NotFoundException({ message: 'User not found.', statusCode: 400, data: null })
       }
       // return this.stripeService.updateProduct(body.id, body.name)
     } catch (error) {
@@ -123,7 +139,7 @@ export class ProductService {
   async updateProductPrice(body) {
     try {
       if (body.amount <= 0) {
-        throw new BadRequestException('Invalid amount')
+        throw new BadRequestException({ message: 'Invalid amount', statusCode: 400, data: null })
       }
       else {
         const { userId, stripeId, priceId, productId, interval } = body
@@ -155,29 +171,29 @@ export class ProductService {
                   return {
                     message: 'price updated',
                     statusCode: 200,
-                    newProduct
+                    data: newProduct
                   }
 
                 }
                 else {
-                  throw new NotFoundException('invalid interval')
+                  throw new NotFoundException({ message: 'invalid interval', statusCode: 400, data: null })
                 }
               }
               else {
-                throw new NotFoundException('invalid price id')
+                throw new NotFoundException({ message: 'invalid price id', statusCode: 400, data: null })
               }
             }
             else {
-              throw new ServiceUnavailableException('Product not found.')
+              throw new BadRequestException({ message: 'Product not found.', statusCode: 400, data: null })
             }
 
           }
           else {
-            throw new NotFoundException('incorrect stripe id.')
+            throw new NotFoundException({ message: 'incorrect stripe id.', statusCode: 400, data: null })
           }
         }
         else {
-          throw new NotFoundException('user not found.')
+          throw new NotFoundException({ message: 'user not found.', statusCode: 400, data: null })
         }
       }
     } catch (error) {
@@ -186,14 +202,20 @@ export class ProductService {
   }
 
   async getProducts() {
+
     try {
-      return this.product.find()
+      const data = await this.product.find()
+      return {
+        message: 'product found',
+        statusCode: 400, data
+      }
     } catch (error) {
       return error.response
     }
   }
 
   async deleteProduct(body) {
+
     try {
       const { userId, stripeId, productId, priceId } = body
       const user = await this.user.findById({ _id: userId })
@@ -209,23 +231,23 @@ export class ProductService {
               return {
                 message: 'product deleted',
                 statusCode: 200,
-                stripe
+                data: stripe
               }
             }
             else {
-              throw new NotFoundException('product not found n stripe')
+              throw new NotFoundException({ message: 'product not found n stripe', statusCode: 400, data: null })
             }
           }
           else {
-            throw new NotFoundException('product not found.')
+            throw new NotFoundException({ message: 'product not found.', statusCode: 400, data: null })
           }
         }
         else {
-          throw new NotFoundException('Stripe id not found.')
+          throw new NotFoundException({ message: 'Stripe id not found.', statusCode: 400, data: null })
         }
       }
       else {
-        throw new NotFoundException('User not found.')
+        throw new NotFoundException({ message: 'User not found.', statusCode: 400, data: null })
       }
       // return this.stripeService.updateProduct(body.id, body.name)
     } catch (error) {
@@ -241,7 +263,7 @@ export class ProductService {
         return link
       }
       else {
-        throw new NotFoundException('Product not found.')
+        throw new NotFoundException({ message: 'Product not found.', statusCode: 400, data: null })
       }
     } catch (error) {
       return error.response

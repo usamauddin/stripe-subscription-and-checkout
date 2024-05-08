@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query } from '@
 import { UserService } from './user.service';
 import Stripe from 'stripe';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
 
   constructor(private readonly userService: UserService) { }
@@ -15,5 +15,6 @@ export class UserController {
       return error.response
     }
   }
+
 
 }
